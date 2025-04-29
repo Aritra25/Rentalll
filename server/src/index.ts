@@ -1,0 +1,38 @@
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import bodyParser from "body-parser";
+import { authMiddleware } from "./middleware/authMiddleware";
+import tenantRoutes from "./routes/tenantRoutes";
+import managerRoutes from "./routes/managerRoutes";
+import propertyRoutes from "./routes/propertyRoutes";
+import applicationRoutes from "./routes/applicationRoutes";
+import leaseRoutes from "./routes/leaseRoutes";
+
+dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 3002;
+app.use(express.json());
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+// app.use(express.urlencoded({ extended: true }));
+app.use(morgan("common"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors());
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.use("/applications", applicationRoutes);
+app.use("/properties", propertyRoutes);
+app.use("/leases", leaseRoutes);
+app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
+app.use("/managers", authMiddleware(["manager"]), managerRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
