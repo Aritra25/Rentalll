@@ -5,7 +5,7 @@ import { cleanParams } from "@/lib/utils";
 import { setFilters } from "@/state";
 import { useAppSelector } from "@/state/redux";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import FiltersBar from "./FiltersBar";
 import FiltersFull from "./FIltersFull";
@@ -67,4 +67,10 @@ const SearchPage = () => {
   );
 };
 
-export default SearchPage;
+export default function SearchPageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-10">Loading search results...</div>}>
+      <SearchPage />
+    </Suspense>
+  );
+}
